@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unsupervized Intelligence — Whitepaper</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        body {
+            font-family: 'Georgia', 'Times New Roman', Times, serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .paper-container {
+            background: #fff;
+            max-width: 850px;
+            margin: 40px auto 40px auto;
+            padding: 120px 120px 120px 120px;
+            border-radius: 12px;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.10);
+            border: 1px solid #e0e0e0;
+        }
+        #content {
+            font-size: 0.95rem;
+            color: #222;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Georgia', 'Times New Roman', Times, serif;
+            font-weight: bold;
+            margin-top: 2.2em;
+            margin-bottom: 0.7em;
+        }
+        h1 {
+            font-size: 2.2em;
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 0.5em;
+        }
+        h2 {
+            font-size: 1.5em;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 0.2em;
+        }
+        h3 {
+            font-size: 1.2em;
+        }
+        p, li {
+            text-align: justify;
+            line-height: 1.7;
+        }
+        .title-block {
+            text-align: center;
+            margin-bottom: 2.5em;
+        }
+        .title-block .title {
+            font-size: 2.2em;
+            font-weight: bold;
+            margin-bottom: 0.8em;
+        }
+        .title-block .authors {
+            font-size: 1.1em;
+            margin-bottom: 0.5em;
+        }
+        .title-block .affiliation {
+            font-size: 1em;
+            color: #555;
+            margin-bottom: 0.5em;
+        }
+        blockquote {
+            border-left: 4px solid #b0b0b0;
+            margin: 20px 0;
+            padding-left: 20px;
+            color: #555;
+            font-style: italic;
+            background: #fafbfc;
+        }
+        code, pre {
+            font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
+            background: #f8f8f8;
+            border-radius: 4px;
+        }
+        pre {
+            padding: 12px;
+            border-left: 4px solid #b0b0b0;
+            overflow-x: auto;
+        }
+        .loading, .error {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+        @media (max-width: 600px) {
+            .paper-container {
+                padding: 18px 6vw;
+            }
+        }
+        #content a {
+            color: inherit;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        #content a:hover {
+            text-decoration: underline dotted;
+        }
+    </style>
+</head>
+<body>
+    <div class="paper-container">
+        <div id="content">
+            <div class="loading">Loading document...</div>
+        </div>
+    </div>
+
+    <script>
+        marked.setOptions({
+            breaks: true,
+            gfm: true
+        });
+
+        // Post-process the rendered HTML to create a scientific paper style title block
+        function enhancePaperStyle() {
+            const content = document.getElementById('content');
+            // Find the first h3 (title), next two elements (authors, affiliation)
+            const h3s = content.querySelectorAll('h3');
+            if (h3s.length >= 1) {
+                const title = h3s[0];
+                // Find next two siblings (authors, affiliation)
+                let next = title.nextElementSibling;
+                let authors = null, affiliation = null;
+                if (next && next.tagName === 'P') {
+                    authors = next;
+                    next = next.nextElementSibling;
+                }
+                if (next && next.tagName === 'P') {
+                    affiliation = next;
+                }
+                // Create title block
+                const titleBlock = document.createElement('div');
+                titleBlock.className = 'title-block';
+                titleBlock.innerHTML =
+                    `<div class="title">${title.innerHTML.replace(/\*\*/g, '')}</div>` +
+                    (authors ? `<div class="authors">${authors.innerHTML}</div>` : '') +
+                    (affiliation ? `<div class="affiliation">${affiliation.innerHTML}</div>` : '');
+                // Replace in DOM
+                content.insertBefore(titleBlock, title);
+                title.remove();
+                if (authors) authors.remove();
+                if (affiliation) affiliation.remove();
+            }
+        }
+
+        async function loadMarkdown() {
+            try {
+                const response = await fetch('Unsupervized Intelligence — A memo.md');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const markdownText = await response.text();
+                const htmlContent = marked.parse(markdownText);
+                document.getElementById('content').innerHTML = htmlContent;
+                enhancePaperStyle();
+            } catch (error) {
+                console.error('Error loading markdown file:', error);
+                document.getElementById('content').innerHTML = 
+                    '<div class="error">Error loading document. Please make sure the markdown file is in the same directory as this HTML file.</div>';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', loadMarkdown);
+    </script>
+</body>
+</html>
