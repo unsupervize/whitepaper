@@ -2,7 +2,7 @@
 
 
 
-[Ranita Jana](https://linkedin.com/in/ranitajana), [Shapath Das](https://linkedin.com/in/shapathdas)
+[Dr. Ranita Jana](https://linkedin.com/in/ranitajana), [Shapath Das](https://linkedin.com/in/shapathdas)
 
 [Unsupervized](https://unsupervized.com)
 
